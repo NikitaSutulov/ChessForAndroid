@@ -28,14 +28,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val boardImageView: ImageView = findViewById(R.id.board_image_view)
+        val boardGrid: GridLayout = findViewById(R.id.board_grid)
         val drawableResource = when (parent!!.getItemAtPosition(position).toString()) {
-            "1" -> R.drawable.board_plain_01
-            "2" -> R.drawable.board_plain_02
-            "3" -> R.drawable.board_plain_03
-            else -> R.drawable.board_plain_04
+            "1" -> R.drawable.board_1
+            "2" -> R.drawable.board_2
+            "3" -> R.drawable.board_3
+            else -> R.drawable.board_4
         }
-        boardImageView.setImageResource(drawableResource)
+        boardGrid.setBackgroundResource(drawableResource)
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
