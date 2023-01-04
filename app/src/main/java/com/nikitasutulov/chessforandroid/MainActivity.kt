@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         for (i in 0..7) {
             for (j in 0..7) {
                 val cellButton = Button(this)
-                cellButton.text = i.toString() + " " + j.toString()
+                cellButton.text = "$i $j"
                 cellButton.textSize = 5f
                 boardGrid.addView(cellButton, i * j)
                 val param: GridLayout.LayoutParams = GridLayout.LayoutParams()
