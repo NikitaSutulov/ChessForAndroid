@@ -10,15 +10,15 @@ class Board (activity: Activity) {
     lateinit var cells: Array<Cell>
     lateinit var gridLayout: GridLayout
 
-    val startMap = arrayOf(
-        Rook("BLACK"), Knight("BLACK"), Bishop("BLACK"), Queen("BLACK"), King("BLACK"), Bishop("BLACK"), Knight("BLACK"), Rook("BLACK"),
-        Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"),
-        null, null, null, null, null, null, null, null,
-        null, null, null, null, null, null, null, null,
-        null, null, null, null, null, null, null, null,
-        null, null, null, null, null, null, null, null,
-        Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"),
-        Rook("WHITE"), Knight("WHITE"), Bishop("WHITE"), Queen("WHITE"), King("WHITE"), Bishop("WHITE"), Knight("WHITE"), Rook("WHITE")
+    private val startMap = arrayOf(
+        arrayOf<Piece?>(Rook("WHITE"), Knight("WHITE"), Bishop("WHITE"), Queen("WHITE"), King("WHITE"), Bishop("WHITE"), Knight("WHITE"), Rook("WHITE")),
+        arrayOf<Piece?>(Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE")),
+        arrayOf<Piece?>(null, null, null, null, null, null, null, null),
+        arrayOf<Piece?>(null, null, null, null, null, null, null, null),
+        arrayOf<Piece?>(null, null, null, null, null, null, null, null),
+        arrayOf<Piece?>(null, null, null, null, null, null, null, null),
+        arrayOf<Piece?>(Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK")),
+        arrayOf<Piece?>(Rook("BLACK"), Knight("BLACK"), Bishop("BLACK"), Queen("BLACK"), King("BLACK"), Bishop("BLACK"), Knight("BLACK"), Rook("BLACK")),
     )
 
     fun init(gridLayout: GridLayout) {
@@ -27,10 +27,9 @@ class Board (activity: Activity) {
         for (i in 0 until gridLayout.childCount) {
             cellsMutableList.add(Cell(
                 gridLayout.getChildAt(i)!! as Button,
-                startMap[i],
+                startMap[i/8][i%8],
                 this
             ))
-            Log.d("POS", i.toString())
         }
         cells = cellsMutableList.toTypedArray()
     }
@@ -42,7 +41,6 @@ class Board (activity: Activity) {
             } else {
                 cells[i].button.setBackgroundColor(0x00000000)
             }
-            Log.d("SHOW", "${i - 1}")
         }
     }
 }
