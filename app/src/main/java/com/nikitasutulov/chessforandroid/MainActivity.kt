@@ -27,10 +27,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         spinner.adapter = adapter
         spinner.onItemSelectedListener = this
 
-        val startButton: Button = findViewById(R.id.start_reset_button)
-        startButton.setOnClickListener {
-            initBoard()
-        }
+        val controller = Controller(this)
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -45,33 +42,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
-    }
-
-    fun initBoard() {
-        val boardGrid: GridLayout = findViewById(R.id.board_grid)
-        boardGrid.removeAllViews()
-        boardGrid.alignmentMode = GridLayout.ALIGN_BOUNDS
-        boardGrid.columnCount = 8
-        boardGrid.rowCount = 8
-        for (i in 0..7) {
-            for (j in 0..7) {
-                val cellButton = Button(this)
-                cellButton.text = "$i $j"
-                cellButton.textSize = 5f
-                boardGrid.addView(cellButton, i * j)
-                val param: GridLayout.LayoutParams = GridLayout.LayoutParams()
-                param.height = boardGrid.width / 8
-                param.width = boardGrid.width / 8
-                param.bottomMargin = 1
-                param.leftMargin = 0
-                param.topMargin = 0
-                param.rightMargin = 1
-                param.columnSpec = GridLayout.spec(i)
-                param.rowSpec = GridLayout.spec(j)
-                cellButton.layoutParams = param
-                cellButton.setBackgroundResource(R.drawable.b_queen)
-            }
-        }
     }
 }
 
