@@ -1,53 +1,48 @@
 package com.nikitasutulov.chessforandroid
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Button
 import android.widget.GridLayout
 
 class Board (activity: Activity) {
     val activity = activity
     lateinit var cells: Array<Cell>
+    lateinit var gridLayout: GridLayout
+
+    val startMap = arrayOf(
+        Rook("BLACK"), Knight("BLACK"), Bishop("BLACK"), Queen("BLACK"), King("BLACK"), Bishop("BLACK"), Knight("BLACK"), Rook("BLACK"),
+        Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"),
+        null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null,
+        Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"),
+        Rook("WHITE"), Knight("WHITE"), Bishop("WHITE"), Queen("WHITE"), King("WHITE"), Bishop("WHITE"), Knight("WHITE"), Rook("WHITE")
+    )
+
     fun init(gridLayout: GridLayout) {
+        this.gridLayout = gridLayout
         val cellsMutableList = mutableListOf<Cell>()
-        for (i in 1..8) {
-            for (j in 1..8) {
-                cellsMutableList.add(Cell(
-                    gridLayout.getChildAt((i - 1) * 8 + j - 1)!! as Button,
-                    getStartingPieceFromCoords(i, j),
-                    this
-                ))
-            }
+        for (i in 0 until gridLayout.childCount) {
+            cellsMutableList.add(Cell(
+                gridLayout.getChildAt(i)!! as Button,
+                startMap[i],
+                this
+            ))
+            Log.d("POS", i.toString())
         }
         cells = cellsMutableList.toTypedArray()
     }
 
-    private fun getStartingPieceFromCoords(x: Int, y: Int): Piece? {
-        var color: String = "WHITE"
-        var piece: Piece? = null
-
-        when (y) {
-            1 -> color = "WHITE"
-            2 -> piece = Pawn("WHITE")
-            7 -> piece = Pawn("BLACK")
-            8 -> color = "BLACK"
-            else -> piece = null
-        }
-
-        when (x) {
-            1, 8 -> piece = Rook(color)
-            2, 7 -> piece = Knight(color)
-            3, 6 -> piece = Bishop(color)
-            4    -> piece = Queen(color)
-            5    -> piece = King(color)
-        }
-        return piece
-    }
-
     fun show() {
-        for (i in 1..8) {
-            if (cells[i-1] != null) {
-                cells[i-1].button.setBackgroundResource(cells[i-1].piece!!.getDrawableID(activity))
+        for (i in 0 until gridLayout.childCount) {
+            if (cells[i].piece != null) {
+                cells[i].button.setBackgroundResource(cells[i].piece!!.getDrawableID(activity))
+            } else {
+                cells[i].button.setBackgroundColor(0x00000000)
             }
+            Log.d("SHOW", "${i - 1}")
         }
     }
 }
