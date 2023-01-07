@@ -10,6 +10,8 @@ class Model(activity: Activity) {
     private var isGameStarted = false
     private var isGamePaused = true
     private val boardGrid: GridLayout = activity.requireViewById<GridLayout>(R.id.board_grid)
+    private val startResetButton: Button = activity.requireViewById<Button>(R.id.start_reset_button)
+    private var pauseResumeButton: Button = activity.requireViewById<Button>(R.id.pause_resume_button)
     private lateinit var board: Board
     //private lateinit var currentCell: Cell
 
@@ -65,28 +67,42 @@ class Model(activity: Activity) {
         } else {
             resetGame()
         }
-        isGameStarted = !isGameStarted
     }
 
     private fun resetGame() {
-        isGamePaused = true
+        isGameStarted = false
+        startResetButton.text = "Start"
+        pauseGame()
+        pauseResumeButton.text = "Pause"
+        pauseResumeButton.isEnabled = false
         clearBoard()
     }
 
     private fun startGame() {
-        isGamePaused = false
+        isGameStarted = true
+        startResetButton.text = "Reset"
+        resumeGame()
+        pauseResumeButton.isEnabled = true
         initBoard()
     }
 
-    fun swapButtonText(button: Button, str1: String, str2: String) {
-        if (button.text.toString() == str1) {
-            button.text = str2
+    fun pauseOrResumeGame() {
+        if (isGamePaused) {
+            resumeGame()
         } else {
-            button.text = str1
+            pauseGame()
         }
     }
 
-    fun pauseOrResumeGame() {
-        isGamePaused = !isGamePaused
+    private fun pauseGame() {
+        isGamePaused = true
+        pauseResumeButton.text = "Resume"
+        Toast.makeText(activity, "Paused", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun resumeGame() {
+        isGamePaused = false
+        pauseResumeButton.text = "Pause"
+        Toast.makeText(activity, "Resumed", Toast.LENGTH_SHORT).show()
     }
 }

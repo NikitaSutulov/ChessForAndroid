@@ -193,7 +193,8 @@
                     android:layout_marginHorizontal="10dp"
                     android:text="Pause"
                     android:layout_weight="1"
-                    android:id="@+id/pause_resume_button"/>
+                    android:id="@+id/pause_resume_button"
+                    android:enabled="false"/>
 
             </LinearLayout>
 
