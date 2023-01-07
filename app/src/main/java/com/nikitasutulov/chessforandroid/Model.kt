@@ -8,6 +8,7 @@ import android.widget.Toast
 class Model(activity: Activity) {
     private val activity = activity
     private var isGameStarted = false
+    private var isGamePaused = true
     private val boardGrid: GridLayout = activity.requireViewById<GridLayout>(R.id.board_grid)
     private lateinit var board: Board
     //private lateinit var currentCell: Cell
@@ -68,10 +69,12 @@ class Model(activity: Activity) {
     }
 
     private fun resetGame() {
+        isGamePaused = true
         clearBoard()
     }
 
     private fun startGame() {
+        isGamePaused = false
         initBoard()
     }
 
@@ -84,6 +87,6 @@ class Model(activity: Activity) {
     }
 
     fun pauseOrResumeGame() {
-    //TODO: pause or resume game
+        isGamePaused = !isGamePaused
     }
 }
