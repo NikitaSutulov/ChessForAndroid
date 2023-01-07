@@ -7,6 +7,4 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     val piece = piece
     val board = board
     val isHiglighted = false
-
-
 }

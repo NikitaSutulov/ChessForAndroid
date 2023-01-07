@@ -1,19 +1,50 @@
 package com.nikitasutulov.chessforandroid
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.util.Log
 import android.widget.Button
 import android.widget.GridLayout
+import android.widget.TextView
 import android.widget.Toast
+import kotlin.math.roundToInt
 
-class Model(activity: Activity) {
-    private val activity = activity
+class Model() {
+    private lateinit var activity: Activity
     private var isGameStarted = false
     private var isGamePaused = true
-    private val boardGrid: GridLayout = activity.requireViewById<GridLayout>(R.id.board_grid)
-    private val startResetButton: Button = activity.requireViewById<Button>(R.id.start_reset_button)
-    private var pauseResumeButton: Button = activity.requireViewById<Button>(R.id.pause_resume_button)
+    private lateinit var boardGrid: GridLayout
+    private lateinit var startResetButton: Button
+    private lateinit var pauseResumeButton: Button
+    private lateinit var timerTextView: TextView
     private lateinit var board: Board
+    private lateinit var serviceIntent: Intent
+    private lateinit var updateTime: BroadcastReceiver
+    private var time = 0.0
+
     //private lateinit var currentCell: Cell
+
+    constructor(activity: Activity) : this() {
+        this.activity = activity
+        boardGrid = activity.requireViewById<GridLayout>(R.id.board_grid)
+        startResetButton = activity.requireViewById<Button>(R.id.start_reset_button)
+        pauseResumeButton = activity.requireViewById<Button>(R.id.pause_resume_button)
+        timerTextView = activity.requireViewById<TextView>(R.id.main_timer)
+        serviceIntent = Intent(activity.applicationContext, TimerService::class.java)
+        updateTime = object : BroadcastReceiver()
+        {
+            override fun onReceive(context: Context, intent: Intent)
+            {
+                time = intent.getDoubleExtra(TimerService.TIME_EXTRA, 0.0)
+                timerTextView.text = getTimeStringFromDouble(time)
+                Log.d("Time", getTimeStringFromDouble(time))
+            }
+        }
+        this.activity.registerReceiver(updateTime, IntentFilter(TimerService.TIMER_UPDATED))
+    }
 
     private fun initBoard() {
         boardGrid.apply {
@@ -54,7 +85,7 @@ class Model(activity: Activity) {
         boardGrid.removeAllViews()
     }
 
-    fun indexToChessCoords(i: Int): String {
+    private fun indexToChessCoords(i: Int): String {
         val x = i % 8
         val y = i / 8 + 1
         val xToChessCoord: String = (x.toChar() + 97).toString()
@@ -76,6 +107,7 @@ class Model(activity: Activity) {
         pauseResumeButton.text = "Pause"
         pauseResumeButton.isEnabled = false
         clearBoard()
+        resetTimer()
     }
 
     private fun startGame() {
@@ -84,6 +116,7 @@ class Model(activity: Activity) {
         resumeGame()
         pauseResumeButton.isEnabled = true
         initBoard()
+        startTimer()
     }
 
     fun pauseOrResumeGame() {
@@ -98,11 +131,47 @@ class Model(activity: Activity) {
         isGamePaused = true
         pauseResumeButton.text = "Resume"
         Toast.makeText(activity, "Paused", Toast.LENGTH_SHORT).show()
+        stopTimer()
     }
 
     private fun resumeGame() {
         isGamePaused = false
         pauseResumeButton.text = "Pause"
         Toast.makeText(activity, "Resumed", Toast.LENGTH_SHORT).show()
+        startTimer()
     }
+
+    private fun resetTimer()
+    {
+        time = 0.0
+        timerTextView.text = getTimeStringFromDouble(time)
+        Log.d("Timer", "Reset!")
+    }
+
+    private fun startTimer()
+    {
+        serviceIntent.putExtra(TimerService.TIME_EXTRA, time)
+        activity.startService(serviceIntent)
+        Log.d("Timer", "Started!")
+//        startResetButton.icon = getDrawable(R.drawable.ic_baseline_pause_24)
+    }
+
+    private fun stopTimer()
+    {
+        activity.stopService(serviceIntent)
+        Log.d("Timer", "Stopped!")
+//        binding.startStopButton.icon = getDrawable(R.drawable.ic_baseline_play_arrow_24)
+    }
+
+    private fun getTimeStringFromDouble(time: Double): String
+    {
+        val resultInt = time.roundToInt()
+        val hours = resultInt % 86400 / 3600
+        val minutes = resultInt % 86400 % 3600 / 60
+        val seconds = resultInt % 86400 % 3600 % 60
+
+        return makeTimeString(hours, minutes, seconds)
+    }
+
+    private fun makeTimeString(hour: Int, min: Int, sec: Int): String = String.format("%02d:%02d:%02d", hour, min, sec)
 }
