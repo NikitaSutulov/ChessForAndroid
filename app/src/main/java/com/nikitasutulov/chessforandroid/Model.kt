@@ -8,31 +8,38 @@ import android.widget.Toast
 class Model(activity: Activity) {
     private val activity = activity
     private var isGameStarted = false
+    private val boardGrid: GridLayout = activity.requireViewById<GridLayout>(R.id.board_grid)
     private lateinit var board: Board
     //private lateinit var currentCell: Cell
 
     private fun initBoard() {
-        val boardGrid: GridLayout = activity.findViewById(R.id.board_grid)
-        boardGrid.alignmentMode = GridLayout.ALIGN_BOUNDS
-        boardGrid.columnCount = 8
-        boardGrid.rowCount = 8
+        boardGrid.apply {
+            alignmentMode = GridLayout.ALIGN_BOUNDS
+            columnCount = 8
+            rowCount = 8
+        }
         for (i in 0..63) {
-                val cellButton = Button(activity)
-                cellButton.textSize = 5f
-                boardGrid.addView(cellButton, i)
-                val param: GridLayout.LayoutParams = GridLayout.LayoutParams()
-                param.height = boardGrid.width / 8
-                param.width = boardGrid.width / 8
-                param.bottomMargin = 1
-                param.leftMargin = 0
-                param.topMargin = 0
-                param.rightMargin = 1
-                param.columnSpec = GridLayout.spec(i % 8)
-                param.rowSpec = GridLayout.spec(7 - i / 8)
-                cellButton.layoutParams = param
-                cellButton.setOnClickListener {
+            val cellButton = Button(activity)
+            boardGrid.addView(cellButton, i)
+
+            val param: GridLayout.LayoutParams = GridLayout.LayoutParams().apply {
+                height = boardGrid.width / 8
+                width = boardGrid.width / 8
+                bottomMargin = 1
+                leftMargin = 0
+                topMargin = 0
+                rightMargin = 1
+                columnSpec = GridLayout.spec(i % 8)
+                rowSpec = GridLayout.spec(7 - i / 8)
+            }
+
+            cellButton.apply {
+                textSize = 5f
+                layoutParams = param
+                setOnClickListener {
                     Toast.makeText(activity, "You clicked on cell ${indexToChessCoords(i)}!", Toast.LENGTH_SHORT).show()
                 }
+            }
         }
         board = Board(activity)
         board.init(boardGrid)
