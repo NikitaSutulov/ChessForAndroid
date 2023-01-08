@@ -25,8 +25,6 @@ class Model() {
     private lateinit var updateTime: BroadcastReceiver
     private var time = 0.0
 
-    //private lateinit var currentCell: Cell
-
     constructor(activity: Activity) : this() {
         this.activity = activity
         boardGrid = activity.requireViewById<GridLayout>(R.id.board_grid)
@@ -40,7 +38,6 @@ class Model() {
             {
                 time = intent.getDoubleExtra(TimerService.TIME_EXTRA, 0.0)
                 timerTextView.text = getTimeStringFromDouble(time)
-                Log.d("Time", getTimeStringFromDouble(time))
             }
         }
         this.activity.registerReceiver(updateTime, IntentFilter(TimerService.TIMER_UPDATED))
@@ -52,31 +49,34 @@ class Model() {
             columnCount = 8
             rowCount = 8
         }
-        for (i in 0..63) {
-            val cellButton = Button(activity)
-            boardGrid.addView(cellButton, i)
+        var currentIndex = 0
+        for (i in 0..7) {
+            for (j in 0..7) {
+                val cellButton = Button(activity)
+                boardGrid.addView(cellButton, currentIndex++)
 
-            val param: GridLayout.LayoutParams = GridLayout.LayoutParams().apply {
-                height = boardGrid.width / 8
-                width = boardGrid.width / 8
-                bottomMargin = 1
-                leftMargin = 0
-                topMargin = 0
-                rightMargin = 1
-                columnSpec = GridLayout.spec(i % 8)
-                rowSpec = GridLayout.spec(7 - i / 8)
-            }
+                val param: GridLayout.LayoutParams = GridLayout.LayoutParams().apply {
+                    height = boardGrid.width / 8
+                    width = boardGrid.width / 8
+                    bottomMargin = 1
+                    leftMargin = 0
+                    topMargin = 0
+                    rightMargin = 1
+                    columnSpec = GridLayout.spec(j)
+                    rowSpec = GridLayout.spec(7 - i)
+                }
 
-            cellButton.apply {
-                textSize = 5f
-                layoutParams = param
-                setOnClickListener {
-                    Toast.makeText(activity, "You clicked on cell ${indexToChessCoords(i)}!", Toast.LENGTH_SHORT).show()
+                cellButton.apply {
+                    textSize = 5f
+                    layoutParams = param
+                    setOnClickListener {
+
+                    }
                 }
             }
         }
         board = Board(activity)
-        board.init(boardGrid)
+        board.init(boardGrid, this)
         board.show()
     }
 
@@ -85,12 +85,6 @@ class Model() {
         boardGrid.removeAllViews()
     }
 
-    private fun indexToChessCoords(i: Int): String {
-        val x = i % 8
-        val y = i / 8 + 1
-        val xToChessCoord: String = (x.toChar() + 97).toString()
-        return "$xToChessCoord$y"
-    }
 
     fun startOrResetGame() {
         if (!isGameStarted) {
@@ -153,14 +147,12 @@ class Model() {
         serviceIntent.putExtra(TimerService.TIME_EXTRA, time)
         activity.startService(serviceIntent)
         Log.d("Timer", "Started!")
-//        startResetButton.icon = getDrawable(R.drawable.ic_baseline_pause_24)
     }
 
     private fun stopTimer()
     {
         activity.stopService(serviceIntent)
         Log.d("Timer", "Stopped!")
-//        binding.startStopButton.icon = getDrawable(R.drawable.ic_baseline_play_arrow_24)
     }
 
     private fun getTimeStringFromDouble(time: Double): String
