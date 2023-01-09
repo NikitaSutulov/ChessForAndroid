@@ -4,7 +4,6 @@ import android.app.Activity
 import android.util.Log
 import android.widget.Button
 import android.widget.GridLayout
-import android.widget.Toast
 
 class Board (activity: Activity) {
     private val activity = activity
@@ -32,6 +31,10 @@ class Board (activity: Activity) {
         arrayOf<Piece?>(Rook("BLACK"), Knight("BLACK"), Bishop("BLACK"), Queen("BLACK"), King("BLACK"), Bishop("BLACK"), Knight("BLACK"), Rook("BLACK")),
     )
 
+    private var selectedCell: Cell? = null
+    private var currentTeam = "WHITE"
+    private val possibleMoves = mutableListOf<Pair<Int, Int>>()
+
     fun init(gridLayout: GridLayout, model: Model) {
         this.gridLayout = gridLayout
         this.gameModel = model
@@ -42,14 +45,38 @@ class Board (activity: Activity) {
                 val button = gridLayout.getChildAt(childCounter++)!! as Button
                 val newCell = Cell(button, startMap[i][j], this)
                 newCell.setCoords(i, j)
-                button.setOnClickListener {
-                    Log.d("Cell click", "You clicked on cell ${getChessCoords(newCell.getX()!!, newCell.getY()!!)}!")
-                    Log.d("Cell click", "The piece is ${newCell.piece!!::class.java.simpleName}")
-                }
                 cellsMutableList.add(mutableListOf())
                 cellsMutableList[i].add(newCell)
             }
             cells[i] = cellsMutableList[i].toTypedArray()
+        }
+        setCellButtonsOnClickListeners()
+    }
+
+    private fun setCellButtonsOnClickListeners() {
+        for (i in 0..7) {
+            for (j in 0..7) {
+                val cell = cells[i][j]!!
+                cell.button.setOnClickListener {
+                    Log.d("Cell click", "You clicked on cell ${getChessCoords(cell.getX()!!, cell.getY()!!)}!")
+                    if (cell.piece != null) {
+                        Log.d("Cell click", "The piece is ${cell.piece!!::class.java.simpleName}")
+                    } else {
+                        Log.d("Cell click", "There is no piece on this cell")
+                    }
+
+                    selectedCell = cell
+                    selectedCell!!.getUnfilteredPossibleMoves()
+                }
+            }
+        }
+    }
+
+    fun toggleButtons(isGamePaused: Boolean) {
+        for (i in 0..7) {
+            for (j in 0..7) {
+                cells[i][j]!!.button!!.isClickable = !isGamePaused
+            }
         }
     }
 
@@ -65,7 +92,9 @@ class Board (activity: Activity) {
         }
     }
 
-    private fun getChessCoords(x: Int, y: Int): String {
+    fun getChessCoords(x: Int, y: Int): String {
         return "${(x.toChar() + 97)}${y + 1}"
     }
+
+    fun getCells() = cells
 }

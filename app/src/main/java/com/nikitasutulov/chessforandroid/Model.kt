@@ -119,6 +119,7 @@ class Model() {
         } else {
             pauseGame()
         }
+        board.toggleButtons(isGamePaused)
     }
 
     private fun pauseGame() {
