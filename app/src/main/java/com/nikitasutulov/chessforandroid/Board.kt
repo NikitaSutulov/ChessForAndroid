@@ -4,6 +4,8 @@ import android.app.Activity
 import android.util.Log
 import android.widget.Button
 import android.widget.GridLayout
+import android.widget.ImageView
+import android.widget.ScrollView
 
 class Board (activity: Activity) {
     private val activity = activity
@@ -33,7 +35,11 @@ class Board (activity: Activity) {
 
     private var selectedCell: Cell? = null
     private var currentTeam = "WHITE"
-    private val possibleMoves = mutableListOf<Pair<Int, Int>>()
+    private var possibleMoves = mutableListOf<Pair<Int, Int>>()
+    private var isMoveStarted = false
+
+    private var whiteDeadPieces: ScrollView = activity.requireViewById(R.id.white_dead_pieces_scrollview)
+    private var blackDeadPieces: ScrollView = activity.requireViewById(R.id.black_dead_pieces_scrollview)
 
     fun init(gridLayout: GridLayout, model: Model) {
         this.gridLayout = gridLayout
@@ -64,9 +70,8 @@ class Board (activity: Activity) {
                     } else {
                         Log.d("Cell click", "There is no piece on this cell")
                     }
-
-                    selectedCell = cell
-                    selectedCell!!.getUnfilteredPossibleMoves()
+                    doMove(cell)
+                    show()
                 }
             }
         }
@@ -83,10 +88,17 @@ class Board (activity: Activity) {
     fun show() {
         for (i in 0..7) {
             for (j in 0..7) {
+                if (cells[i][j]!!.isHiglighted) {
+                    if (cells[i][j]!!.piece != null) {
+                        cells[i][j]!!.button.setBackgroundResource(cells[i][j]!!.piece!!.getHighlightedDrawableID())
+                    } else {
+                        cells[i][j]!!.button.setBackgroundResource(R.drawable.green)
+                    }
+                }
                 if (cells[i][j]!!.piece != null) {
-                    cells[i][j]!!.button.setBackgroundResource(cells[i][j]!!.piece!!.getDrawableID(activity))
+                    cells[i][j]!!.button.setBackgroundResource(cells[i][j]!!.piece!!.getDrawableID())
                 } else {
-                    cells[i][j]!!.button.setBackgroundColor(0x00000000)
+                    cells[i][j]!!.button.setBackgroundResource(R.drawable.transparent)
                 }
             }
         }
@@ -97,4 +109,50 @@ class Board (activity: Activity) {
     }
 
     fun getCells() = cells
+
+    fun doMove(cell: Cell) {
+        if (!isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
+            selectedCell = cell
+            possibleMoves = selectedCell!!.getPossibleMoves().toMutableList()
+            isMoveStarted = true
+        } else if (isMoveStarted && cell.piece?.color != currentTeam) {
+            if (possibleMoves.filter { pair -> pair.first == cell.getX() && pair.second == cell.getY()}.isNotEmpty()) {
+                movePiece(selectedCell!!, cell)
+                selectedCell = null
+                isMoveStarted = false
+                switchCurrentTeam()
+            }
+        }
+    }
+
+    private fun movePiece(selectedCell: Cell, cell: Cell) {
+        if (cell.piece == null) {
+            cell.piece = selectedCell.piece
+            selectedCell.piece = null
+        } else {
+            if (currentTeam == "WHITE") {
+//                blackDeadPieces.addView(ImageView(activity).apply {
+//                    scaleType = ImageView.ScaleType.FIT_XY
+//                    adjustViewBounds = true
+//                    setImageResource(cell.piece!!.getDrawableID())
+//                })
+            } else {
+//                whiteDeadPieces.addView(ImageView(activity).apply {
+//                    scaleType = ImageView.ScaleType.FIT_XY
+//                    adjustViewBounds = true
+//                    setImageResource(cell.piece!!.getDrawableID())
+//                })
+            }
+            cell.piece = selectedCell.piece
+            selectedCell.piece = null
+        }
+    }
+
+    private fun switchCurrentTeam() {
+        currentTeam = if (currentTeam == "WHITE") {
+            "BLACK"
+        } else {
+            "WHITE"
+        }
+    }
 }

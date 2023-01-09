@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import android.widget.Button
-import android.widget.GridLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import kotlin.math.roundToInt
 
 class Model() {
@@ -101,7 +98,15 @@ class Model() {
         pauseResumeButton.text = "Pause"
         pauseResumeButton.isEnabled = false
         clearBoard()
+        clearDeadPiecesScrollViews()
         resetTimer()
+    }
+
+    private fun clearDeadPiecesScrollViews() {
+        val whiteDeadPieces: ScrollView = activity.requireViewById(R.id.white_dead_pieces_scrollview)
+        val blackDeadPieces: ScrollView = activity.requireViewById(R.id.black_dead_pieces_scrollview)
+        whiteDeadPieces.removeAllViews()
+        blackDeadPieces.removeAllViews()
     }
 
     private fun startGame() {

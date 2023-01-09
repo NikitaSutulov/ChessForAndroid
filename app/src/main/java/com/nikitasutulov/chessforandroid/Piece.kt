@@ -8,7 +8,11 @@ abstract class Piece (color: String) {
     val color = color
     lateinit var icon: Drawable
 
-    open fun getDrawableID(activity: Activity): Int {
+    open fun getDrawableID(): Int {
+        return 0
+    }
+
+    open fun getHighlightedDrawableID(): Int {
         return 0
     }
 }

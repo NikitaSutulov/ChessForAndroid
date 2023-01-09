@@ -10,7 +10,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     val cells = board.getCells()
     private var x: Int? = null
     private var y: Int? = null
-    val isHiglighted = false
+    var isHiglighted = false
 
     fun setCoords(xCoord: Int, yCoord: Int) {
         if (x == null && y == null) {
@@ -24,28 +24,38 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     fun getX() = x
     fun getY() = y
 
-    fun getUnfilteredPossibleMoves(): Array<Pair<Int, Int>> {
+    fun getPossibleMoves(): Array<Pair<Int, Int>> {
         val possibleMoves = mutableListOf<Pair<Int, Int>>()
         if (piece == null) {
             return possibleMoves.toTypedArray()
         }
         when (piece!!::class.java.simpleName) {
             "Pawn" -> {
-                if (piece!!.color == "WHITE" && y!! != 7) {
-                    possibleMoves.add(Pair(x!! + 1, y!!))
+                if (piece!!.color == "WHITE") {
                     if (x!! != 7) {
+                        possibleMoves.add(Pair(x!! + 1, y!!))
+                    }
+                    if (x!! != 7 && y!! != 7) {
                         possibleMoves.add(Pair(x!! + 1, y!! + 1))
                     }
-                    if (x!! != 0) {
+                    if (x!! != 7 && y!! != 0) {
                         possibleMoves.add(Pair(x!! + 1, y!! - 1))
                     }
-                    if (!piece!!.isMoved && y!! != 6) {
+                    if (!piece!!.isMoved && x!! != 6) {
                         possibleMoves.add(Pair(x!! + 2, y!!))
                     }
-                } else if (piece!!.color == "BLACK" && y!! != 0) {
-                    possibleMoves.add(Pair(x!! + 1, y!!))
-                    if (!piece!!.isMoved && y!! != 1) {
-                        possibleMoves.add(Pair(x!! + 2, y!!))
+                } else if (piece!!.color == "BLACK") {
+                    if (x!! != 0) {
+                        possibleMoves.add(Pair(x!! - 1, y!!))
+                    }
+                    if (x!! != 0 && y!! != 0) {
+                        possibleMoves.add(Pair(x!! - 1, y!! - 1))
+                    }
+                    if (x!! != 0 && y!! != 7) {
+                        possibleMoves.add(Pair(x!! - 1, y!! + 1))
+                    }
+                    if (!piece!!.isMoved && x!! > 1) {
+                        possibleMoves.add(Pair(x!! - 2, y!!))
                     }
                 }
             }
@@ -54,42 +64,42 @@ class Cell(button: Button, piece: Piece?, board: Board) {
             }
             "Knight" -> {
                 if (coordsInRange(x!! - 2, y!! + 1)) {
-                    if (checkCellForFreeSpace(cells[y!! + 1][x!! - 2]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! - 2][y!! + 1]!!)) {
                         possibleMoves.add(Pair(x!! - 2, y!! + 1))
                     }
                 }
                 if (coordsInRange(x!! - 2, y!! - 1)) {
-                    if (checkCellForFreeSpace(cells[y!! - 1][x!! - 2]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! - 2][y!! - 1]!!)) {
                         possibleMoves.add(Pair(x!! - 2, y!! - 1))
                     }
                 }
                 if (coordsInRange(x!! + 2, y!! + 1)) {
-                    if (checkCellForFreeSpace(cells[y!! + 1][x!! + 2]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! + 2][y!! + 1]!!)) {
                         possibleMoves.add(Pair(x!! + 2, y!! + 1))
                     }
                 }
                 if (coordsInRange(x!! + 2, y!! - 1)) {
-                    if (checkCellForFreeSpace(cells[y!! - 1][x!! + 2]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! + 2][y!! - 1]!!)) {
                         possibleMoves.add(Pair(x!! + 2, y!! - 1))
                     }
                 }
                 if (coordsInRange(x!! - 1, y!! + 2)) {
-                    if (checkCellForFreeSpace(cells[y!! + 2][x!! - 1]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! - 1][y!! + 2]!!)) {
                         possibleMoves.add(Pair(x!! - 1, y!! + 2))
                     }
                 }
                 if (coordsInRange(x!! + 1, y!! + 2)) {
-                    if (checkCellForFreeSpace(cells[y!! + 2][x!! + 1]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! + 1][y!! + 2]!!)) {
                         possibleMoves.add(Pair(x!! + 1, y!! + 2))
                     }
                 }
                 if (coordsInRange(x!! - 1, y!! - 2)) {
-                    if (checkCellForFreeSpace(cells[y!! - 2][x!! - 1]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! - 1][y!! - 2]!!)) {
                         possibleMoves.add(Pair(x!! - 1, y!! - 2))
                     }
                 }
                 if (coordsInRange(x!! + 1, y!! - 2)) {
-                    if (checkCellForFreeSpace(cells[y!! - 2][x!! + 1]!!)) {
+                    if (checkCellForFreeSpace(cells[x!! + 1][y!! - 2]!!)) {
                         possibleMoves.add(Pair(x!! + 1, y!! - 2))
                     }
                 }
@@ -102,28 +112,44 @@ class Cell(button: Button, piece: Piece?, board: Board) {
                 diagonal(possibleMoves)
             }
             "King" -> {
-                if (x!! <= 6) {
-                    possibleMoves.add(Pair(x!! + 1, y!!))
-                    if (y!! >= 1) {
-                        possibleMoves.add(Pair(x!! + 1, y!! - 1))
+                if (coordsInRange(x!! - 1, y!! + 1)) {
+                    if (checkCellForFreeSpace(cells[x!! - 1][y!! + 1]!!)) {
+                        possibleMoves.add(Pair(x!! - 1, y!! + 1))
                     }
-                    if (y!! <= 6) {
+                }
+                if (coordsInRange(x!! - 1, y!! - 1)) {
+                    if (checkCellForFreeSpace(cells[x!! - 1][y!! - 1]!!)) {
+                        possibleMoves.add(Pair(x!! - 1, y!! - 1))
+                    }
+                }
+                if (coordsInRange(x!! + 1, y!! + 1)) {
+                    if (checkCellForFreeSpace(cells[x!! + 1][y!! + 1]!!)) {
                         possibleMoves.add(Pair(x!! + 1, y!! + 1))
                     }
                 }
-                if (y!! >= 1) {
-                    possibleMoves.add(Pair(x!!, y!! - 1))
-                }
-                if (y!! <= 6) {
-                    possibleMoves.add(Pair(x!!, y!! + 1))
-                }
-                if (x!! >= 1) {
-                    possibleMoves.add(Pair(x!! - 1, y!!))
-                    if (y!! >= 1) {
-                        possibleMoves.add(Pair(x!! - 1, y!! - 1))
+                if (coordsInRange(x!! + 1, y!! - 1)) {
+                    if (checkCellForFreeSpace(cells[x!! + 1][y!! - 1]!!)) {
+                        possibleMoves.add(Pair(x!! + 1, y!! - 1))
                     }
-                    if (y!! <= 6) {
-                        possibleMoves.add(Pair(x!! - 1, y!! + 1))
+                }
+                if (coordsInRange(x!! - 1, y!!)) {
+                    if (checkCellForFreeSpace(cells[x!! - 1][y!!]!!)) {
+                        possibleMoves.add(Pair(x!! - 1, y!!))
+                    }
+                }
+                if (coordsInRange(x!! + 1, y!!)) {
+                    if (checkCellForFreeSpace(cells[x!! + 1][y!!]!!)) {
+                        possibleMoves.add(Pair(x!! + 1, y!!))
+                    }
+                }
+                if (coordsInRange(x!!, y!! - 1)) {
+                    if (checkCellForFreeSpace(cells[x!!][y!! - 1]!!)) {
+                        possibleMoves.add(Pair(x!!, y!! - 1))
+                    }
+                }
+                if (coordsInRange(x!!, y!! + 1)) {
+                    if (checkCellForFreeSpace(cells[x!!][y!! + 1]!!)) {
+                        possibleMoves.add(Pair(x!!, y!! + 1))
                     }
                 }
             }
@@ -135,7 +161,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     private fun verticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, y!!)) {
-                if (!checkCellForFreeSpace(cells[y!!][i]!!)) {
+                if (!checkCellForFreeSpace(cells[i][y!!]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(i, y!!))
@@ -143,7 +169,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
         for (i in (x!! - 1) downTo 0) {
             if (coordsInRange(i, y!!)) {
-                if (!checkCellForFreeSpace(cells[y!!][i]!!)) {
+                if (!checkCellForFreeSpace(cells[i][y!!]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(i, y!!))
@@ -151,7 +177,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
         for (j in (y!! + 1)..7) {
             if (coordsInRange(x!!, j)) {
-                if (!checkCellForFreeSpace(cells[j][x!!]!!)) {
+                if (!checkCellForFreeSpace(cells[x!!][j]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(x!!, j))
@@ -159,7 +185,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
         for (j in (y!! - 1) downTo 0) {
             if (coordsInRange(x!!, j)) {
-                if (!checkCellForFreeSpace(cells[j][x!!]!!)) {
+                if (!checkCellForFreeSpace(cells[x!!][j]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(x!!, j))
@@ -171,7 +197,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         var j = y!! + 1
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[j][i]!!)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -186,7 +212,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         j = y!! - 1
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[j][i]!!)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -201,7 +227,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         j = y!! + 1
         for (i in (x!! - 1) downTo 0) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[j][i]!!)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -216,7 +242,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         j = y!! - 1
         for (i in (x!! - 1) downTo 0) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[j][i]!!)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -235,9 +261,12 @@ class Cell(button: Button, piece: Piece?, board: Board) {
 
     fun checkCellForFreeSpace(cell: Cell): Boolean {
         if (cell.piece == null) {
+            cell.isHiglighted = true
             return true
         }
-        if (cell.piece!!.color != piece!!.color) {
+        if ((cell.piece!!.color == "WHITE" && piece!!.color == "BLACK")
+            || (cell.piece!!.color == "BLACK" && piece!!.color == "WHITE")) {
+            cell.isHiglighted = true
             return true
         }
         return false
