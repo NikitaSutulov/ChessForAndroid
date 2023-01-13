@@ -63,15 +63,15 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     }
 
     private fun setCellsList(color: String): MutableList<Cell> {
-        val whiteCells = mutableListOf<Cell>()
+        val colorCells = mutableListOf<Cell>()
         for (i in 0..7) {
             for (j in 0..7) {
                 if (cells[i][j]!!.piece?.color == color) {
-                    whiteCells.add(cells[i][j]!!)
+                    colorCells.add(cells[i][j]!!)
                 }
             }
         }
-        return whiteCells
+        return colorCells
     }
 
     private fun setCellButtonsOnClickListeners() {
@@ -121,12 +121,12 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     private fun doMove(cell: Cell) {
         if (!isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
             selectedCell = cell
-            possibleMoves = selectedCell!!.getPossibleMoves().toMutableList()
+            possibleMoves = selectedCell!!.getPossibleMoves()
             isMoveStarted = true
             moveTimer.start()
         } else if (isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
             selectedCell = cell
-            possibleMoves = selectedCell!!.getPossibleMoves().toMutableList()
+            possibleMoves = selectedCell!!.getPossibleMoves()
         } else if (isMoveStarted && cell.piece?.color != currentTeam) {
             if (possibleMoves.any { pair -> pair.first == cell.getX() && pair.second == cell.getY() }) {
                 activity.requireViewById<TextView>(R.id.last_move_tv).apply {
@@ -164,7 +164,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         } else {
             Collections.replaceAll(blackCells, selectedCell, cell)
         }
-        handleAllChecks()
+        handleAllChecks(cells)
     }
 
     private fun checkForPromotion(cell: Cell) {
@@ -187,19 +187,34 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         }
     }
 
-    private fun isCheck(moves: MutableList<Pair<Int, Int>>): Boolean {
+    private fun isCheckFromCell(cells: Array<Array<Cell?>>, moves: MutableList<Pair<Int, Int>>): Boolean {
         return (moves.any { move -> cells[move.first][move.second]!!.piece != null && cells[move.first][move.second]!!.piece!!::class.java.simpleName == "King" })
     }
 
-    private fun handleAllChecks() {
+    private fun handleAllChecks(cells: Array<Array<Cell?>>) {
         val currentTeamCells = if (currentTeam == WHITE) whiteCells else blackCells
+        var isAnyCheck = false
         for (cell: Cell in currentTeamCells) {
-            if (isCheck(cell.getPossibleMoves().toMutableList())) {
+            if (isCheckFromCell(cells, cell.getPossibleMoves())) {
+                isAnyCheck = true
+                isCheck = true
                 Log.d("Check", "from cell ${getChessCoords(cell.getX()!!, cell.getY()!!)}")
                 Toast.makeText(activity, "Check", Toast.LENGTH_SHORT).show()
                 threatingCells.add(cell)
             }
         }
+        if (!isAnyCheck) {
+            cancelCheck()
+        }
+    }
+
+    private fun cancelCheck() {
+        isCheck = false
+        threatingCells = mutableListOf()
+    }
+
+    private fun checkForMate() {
+        // TODO
     }
 
     fun resetMoveTimer() {

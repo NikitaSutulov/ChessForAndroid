@@ -6,8 +6,7 @@ import android.widget.Button
 class Cell(button: Button, piece: Piece?, board: Board) {
     val button = button
     var piece = piece
-    val board = board
-    val cells = board.getCells()
+    private val cells = board.getCells()
     private var x: Int? = null
     private var y: Int? = null
 
@@ -23,10 +22,10 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     fun getX() = x
     fun getY() = y
 
-    fun getPossibleMoves(): Array<Pair<Int, Int>> {
+    fun getPossibleMoves(): MutableList<Pair<Int, Int>> {
         val possibleMoves = mutableListOf<Pair<Int, Int>>()
         if (piece == null) {
-            return possibleMoves.toTypedArray()
+            return possibleMoves
         }
         when (piece!!::class.java.simpleName) {
             "Pawn" -> {
@@ -169,7 +168,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
                 }
             }
         }
-        return possibleMoves.toTypedArray()
+        return possibleMoves
     }
 
     private fun castVerticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {

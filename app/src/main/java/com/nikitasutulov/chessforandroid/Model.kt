@@ -97,6 +97,9 @@ class Model() {
         isGameStarted = true
         startResetButton.text = "Reset"
         pauseResumeButton.isEnabled = true
+        activity.requireViewById<TextView>(R.id.current_move_tv).apply {
+            text = "WHITE\n"
+        }
         initBoard()
         resumeGame()
         timer.start()
