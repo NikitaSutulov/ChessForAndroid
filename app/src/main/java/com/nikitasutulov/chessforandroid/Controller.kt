@@ -3,7 +3,7 @@ package com.nikitasutulov.chessforandroid
 import android.app.Activity
 import android.widget.Button
 
-class Controller () {
+class Controller() {
     constructor(activity: Activity) : this() {
         val model = Model(activity)
 

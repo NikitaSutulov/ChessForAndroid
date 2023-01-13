@@ -5,7 +5,7 @@ import android.util.Log
 import android.widget.*
 import java.util.*
 
-class Board (activity: Activity, currentMoveTV: TextView) {
+class Board(activity: Activity, currentMoveTV: TextView) {
     private val activity = activity
     private val moveTimer = MoveTimer(activity, currentMoveTV)
     private val cells: Array<Array<Cell?>> = arrayOf(
@@ -175,8 +175,9 @@ class Board (activity: Activity, currentMoveTV: TextView) {
     }
 
     private fun checkForPromotion(cell: Cell) {
-        if (cell.piece!!.color == WHITE && cell.getX() == 7
-            || cell.piece!!.color == BLACK && cell.getX() == 0) {
+        if (cell.piece!!.color == WHITE && cell.getX() == 7 ||
+            cell.piece!!.color == BLACK && cell.getX() == 0
+        ) {
             cell.promotePawn()
             show()
         }
@@ -219,7 +220,7 @@ class Board (activity: Activity, currentMoveTV: TextView) {
     fun resumeMoveTimer() {
         moveTimer.start()
     }
-    
+
     companion object {
         const val WHITE = "WHITE"
         const val BLACK = "BLACK"

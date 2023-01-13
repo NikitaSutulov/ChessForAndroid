@@ -50,7 +50,6 @@ class Model() {
                     textSize = 5f
                     layoutParams = param
                     setOnClickListener {
-
                     }
                 }
             }

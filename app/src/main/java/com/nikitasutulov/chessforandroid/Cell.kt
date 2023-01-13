@@ -279,8 +279,9 @@ class Cell(button: Button, piece: Piece?, board: Board) {
             cell.isHiglighted = true
             return true
         }
-        if (cell.piece!!.color == Board.WHITE && piece!!.color == Board.BLACK
-            || cell.piece!!.color == Board.BLACK && piece!!.color == Board.WHITE) {
+        if (cell.piece!!.color == Board.WHITE && piece!!.color == Board.BLACK ||
+            cell.piece!!.color == Board.BLACK && piece!!.color == Board.WHITE
+        ) {
             cell.isHiglighted = true
             return true
         }

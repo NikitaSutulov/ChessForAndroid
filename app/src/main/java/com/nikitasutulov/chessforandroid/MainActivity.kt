@@ -5,15 +5,13 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
-
-class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
+class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         try {
             this.supportActionBar!!.hide()
-        }
-        catch (e: NullPointerException) {
+        } catch (e: NullPointerException) {
         }
 
         val spinner: Spinner = findViewById(R.id.board_designs_spinner)
@@ -44,4 +42,3 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
     override fun onNothingSelected(p0: AdapterView<*>?) {
     }
 }
-

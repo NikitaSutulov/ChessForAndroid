@@ -1,6 +1,6 @@
 package com.nikitasutulov.chessforandroid
 
-class Knight(color: String): Piece(color) {
+class Knight(color: String) : Piece(color) {
     override fun getDrawableID(): Int {
         return when (color) {
             Board.WHITE -> R.drawable.w_knight
