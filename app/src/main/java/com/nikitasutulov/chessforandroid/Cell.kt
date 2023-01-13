@@ -31,18 +31,18 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
         when (piece!!::class.java.simpleName) {
             "Pawn" -> {
-                if (piece!!.color == "WHITE") {
+                if (piece!!.color == Board.WHITE) {
                     if (x!! != 7) {
                         if (checkCellForFreeSpace(cells[x!! + 1][y!!]!!) && checkPawnStraightMove(cells[x!! + 1][y!!]!!)) {
                             possibleMoves.add(Pair(x!! + 1, y!!))
                         }
                     }
-                    if (x!! != 7 && y!! != 7 && cells[x!! + 1][y!! + 1]!!.piece != null && cells[x!! + 1][y!! + 1]!!.piece?.color == "BLACK") {
+                    if (x!! != 7 && y!! != 7 && cells[x!! + 1][y!! + 1]!!.piece != null && cells[x!! + 1][y!! + 1]!!.piece?.color == Board.BLACK) {
                         if (checkCellForFreeSpace(cells[x!! + 1][y!! + 1]!!)) {
                             possibleMoves.add(Pair(x!! + 1, y!! + 1))
                         }
                     }
-                    if (x!! != 7 && y!! != 0 && cells[x!! + 1][y!! - 1]!!.piece != null && cells[x!! + 1][y!! - 1]!!.piece?.color == "BLACK") {
+                    if (x!! != 7 && y!! != 0 && cells[x!! + 1][y!! - 1]!!.piece != null && cells[x!! + 1][y!! - 1]!!.piece?.color == Board.BLACK) {
                         if (checkCellForFreeSpace(cells[x!! + 1][y!! - 1]!!)) {
                             possibleMoves.add(Pair(x!! + 1, y!! - 1))
                         }
@@ -52,18 +52,18 @@ class Cell(button: Button, piece: Piece?, board: Board) {
                             possibleMoves.add(Pair(x!! + 2, y!!))
                         }
                     }
-                } else if (piece!!.color == "BLACK") {
+                } else if (piece!!.color == Board.BLACK) {
                     if (x!! != 0) {
                         if (checkCellForFreeSpace(cells[x!! - 1][y!!]!!) && checkPawnStraightMove(cells[x!! - 1][y!!]!!)) {
                             possibleMoves.add(Pair(x!! - 1, y!!))
                         }
                     }
-                    if (x!! != 0 && y!! != 0 && cells[x!! - 1][y!! - 1]!!.piece != null && cells[x!! - 1][y!! - 1]!!.piece?.color == "WHITE") {
+                    if (x!! != 0 && y!! != 0 && cells[x!! - 1][y!! - 1]!!.piece != null && cells[x!! - 1][y!! - 1]!!.piece?.color == Board.WHITE) {
                         if (checkCellForFreeSpace(cells[x!! - 1][y!! - 1]!!)) {
                             possibleMoves.add(Pair(x!! - 1, y!! - 1))
                         }
                     }
-                    if (x!! != 0 && y!! != 7 && cells[x!! - 1][y!! + 1]!!.piece != null && cells[x!! - 1][y!! + 1]!!.piece?.color == "WHITE") {
+                    if (x!! != 0 && y!! != 7 && cells[x!! - 1][y!! + 1]!!.piece != null && cells[x!! - 1][y!! + 1]!!.piece?.color == Board.WHITE) {
                         if (checkCellForFreeSpace(cells[x!! - 1][y!! + 1]!!)) {
                             possibleMoves.add(Pair(x!! - 1, y!! + 1))
                         }
@@ -171,7 +171,6 @@ class Cell(button: Button, piece: Piece?, board: Board) {
             }
         }
         return possibleMoves.toTypedArray()
-//            .also { it.map { pair -> Log.d("Possible moves", board.getChessCoords(pair.first, pair.second)) } }
     }
 
     private fun verticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
@@ -280,8 +279,8 @@ class Cell(button: Button, piece: Piece?, board: Board) {
             cell.isHiglighted = true
             return true
         }
-        if (cell.piece!!.color == "WHITE" && piece!!.color == "BLACK"
-            || cell.piece!!.color == "BLACK" && piece!!.color == "WHITE") {
+        if (cell.piece!!.color == Board.WHITE && piece!!.color == Board.BLACK
+            || cell.piece!!.color == Board.BLACK && piece!!.color == Board.WHITE) {
             cell.isHiglighted = true
             return true
         }

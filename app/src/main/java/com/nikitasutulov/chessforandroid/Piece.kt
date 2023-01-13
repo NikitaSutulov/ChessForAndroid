@@ -1,6 +1,5 @@
 package com.nikitasutulov.chessforandroid
 
-import android.app.Activity
 import android.graphics.drawable.Drawable
 
 abstract class Piece (color: String) {
