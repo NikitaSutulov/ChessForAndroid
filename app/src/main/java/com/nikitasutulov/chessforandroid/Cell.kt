@@ -10,7 +10,6 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     val cells = board.getCells()
     private var x: Int? = null
     private var y: Int? = null
-    var isHiglighted = false
 
     fun setCoords(xCoord: Int, yCoord: Int) {
         if (x == null && y == null) {
@@ -76,7 +75,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
                 }
             }
             "Rook" -> {
-                verticalHorizontal(possibleMoves)
+                castVerticalHorizontal(possibleMoves)
             }
             "Knight" -> {
                 if (coordsInRange(x!! - 2, y!! + 1)) {
@@ -121,11 +120,11 @@ class Cell(button: Button, piece: Piece?, board: Board) {
                 }
             }
             "Bishop" -> {
-                diagonal(possibleMoves)
+                castDiagonal(possibleMoves)
             }
             "Queen" -> {
-                verticalHorizontal(possibleMoves)
-                diagonal(possibleMoves)
+                castVerticalHorizontal(possibleMoves)
+                castDiagonal(possibleMoves)
             }
             "King" -> {
                 if (coordsInRange(x!! - 1, y!! + 1)) {
@@ -173,7 +172,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         return possibleMoves.toTypedArray()
     }
 
-    private fun verticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
+    private fun castVerticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, y!!)) {
                 if (!checkCellForFreeSpace(cells[i][y!!]!!)) {
@@ -208,7 +207,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
     }
 
-    private fun diagonal(possibleMoves: MutableList<Pair<Int, Int>>) {
+    private fun castDiagonal(possibleMoves: MutableList<Pair<Int, Int>>) {
         var j = y!! + 1
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, j)) {
@@ -276,13 +275,11 @@ class Cell(button: Button, piece: Piece?, board: Board) {
 
     private fun checkCellForFreeSpace(cell: Cell): Boolean {
         if (cell.piece == null) {
-            cell.isHiglighted = true
             return true
         }
         if (cell.piece!!.color == Board.WHITE && piece!!.color == Board.BLACK ||
             cell.piece!!.color == Board.BLACK && piece!!.color == Board.WHITE
         ) {
-            cell.isHiglighted = true
             return true
         }
         return false
