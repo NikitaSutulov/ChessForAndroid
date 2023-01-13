@@ -7,7 +7,4 @@ class Pawn(color: String) : Piece(color) {
             else -> R.drawable.b_pawn
         }
     }
-    override fun getHighlightedDrawableID(): Int {
-        return R.drawable.g_pawn
-    }
 }

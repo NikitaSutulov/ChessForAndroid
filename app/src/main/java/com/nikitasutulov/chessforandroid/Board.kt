@@ -103,13 +103,6 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     fun show() {
         for (i in 0..7) {
             for (j in 0..7) {
-                if (cells[i][j]!!.isHiglighted) {
-                    if (cells[i][j]!!.piece != null) {
-                        cells[i][j]!!.button.setBackgroundResource(cells[i][j]!!.piece!!.getHighlightedDrawableID())
-                    } else {
-                        cells[i][j]!!.button.setBackgroundResource(R.drawable.green)
-                    }
-                }
                 if (cells[i][j]!!.piece != null) {
                     cells[i][j]!!.button.setBackgroundResource(cells[i][j]!!.piece!!.getDrawableID())
                 } else {
@@ -203,6 +196,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         for (cell: Cell in currentTeamCells) {
             if (isCheck(cell.getPossibleMoves().toMutableList())) {
                 Log.d("Check", "from cell ${getChessCoords(cell.getX()!!, cell.getY()!!)}")
+                Toast.makeText(activity, "Check", Toast.LENGTH_SHORT).show()
                 threatingCells.add(cell)
             }
         }

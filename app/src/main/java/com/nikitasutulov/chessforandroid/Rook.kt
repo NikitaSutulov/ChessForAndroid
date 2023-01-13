@@ -8,7 +8,4 @@ class Rook(color: String) : Piece(color) {
         }
     }
 
-    override fun getHighlightedDrawableID(): Int {
-        return R.drawable.g_rook
-    }
 }

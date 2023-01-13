@@ -80,7 +80,6 @@ class Model() {
         pauseResumeButton.isEnabled = false
         clearBoard()
         clearGameInfo()
-        clearDeadPiecesScrollViews()
         timer.reset()
         board.resetMoveTimer()
     }
@@ -92,13 +91,6 @@ class Model() {
         activity.requireViewById<TextView>(R.id.current_move_tv).apply {
             text = "\n"
         }
-    }
-
-    private fun clearDeadPiecesScrollViews() {
-        val whiteDeadPieces: ScrollView = activity.requireViewById(R.id.white_dead_pieces_scrollview)
-        val blackDeadPieces: ScrollView = activity.requireViewById(R.id.black_dead_pieces_scrollview)
-        whiteDeadPieces.removeAllViews()
-        blackDeadPieces.removeAllViews()
     }
 
     private fun startGame() {
