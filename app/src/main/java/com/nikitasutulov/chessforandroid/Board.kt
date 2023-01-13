@@ -25,22 +25,21 @@ class Board (activity: Activity, currentMoveTV: TextView) {
     private lateinit var gameModel: Model
 
     private val startMap = arrayOf(
-        arrayOf<Piece?>(Rook("WHITE"), Knight("WHITE"), Bishop("WHITE"), Queen("WHITE"), King("WHITE"), Bishop("WHITE"), Knight("WHITE"), Rook("WHITE")),
-        arrayOf<Piece?>(Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE"), Pawn("WHITE")),
+        arrayOf<Piece?>(Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE), King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)),
+        arrayOf<Piece?>(Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)),
         arrayOf<Piece?>(null, null, null, null, null, null, null, null),
         arrayOf<Piece?>(null, null, null, null, null, null, null, null),
         arrayOf<Piece?>(null, null, null, null, null, null, null, null),
         arrayOf<Piece?>(null, null, null, null, null, null, null, null),
-        arrayOf<Piece?>(Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK"), Pawn("BLACK")),
-        arrayOf<Piece?>(Rook("BLACK"), Knight("BLACK"), Bishop("BLACK"), Queen("BLACK"), King("BLACK"), Bishop("BLACK"), Knight("BLACK"), Rook("BLACK")),
+        arrayOf<Piece?>(Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)),
+        arrayOf<Piece?>(Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK), King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)),
     )
 
     private var selectedCell: Cell? = null
-    private var currentTeam = "WHITE"
+    private var currentTeam = WHITE
     private var possibleMoves = mutableListOf<Pair<Int, Int>>()
     private var isMoveStarted = false
-    private var isWhiteCheck = false
-    private var isBlackCheck = false
+    private var isCheck = false
 
     fun init(gridLayout: GridLayout, model: Model) {
         this.gridLayout = gridLayout
@@ -57,8 +56,8 @@ class Board (activity: Activity, currentMoveTV: TextView) {
             }
             cells[i] = cellsMutableList[i].toTypedArray()
         }
-        whiteCells = setCellsList("WHITE")
-        blackCells = setCellsList("BLACK")
+        whiteCells = setCellsList(WHITE)
+        blackCells = setCellsList(BLACK)
         setCellButtonsOnClickListeners()
         moveTimer.start()
     }
@@ -157,7 +156,7 @@ class Board (activity: Activity, currentMoveTV: TextView) {
         } else {
             cell.piece = selectedCell.piece
             selectedCell.piece = null
-            if (currentTeam == "WHITE") {
+            if (currentTeam == WHITE) {
                 blackCells.remove(cell)
             } else {
                 whiteCells.remove(cell)
@@ -167,7 +166,7 @@ class Board (activity: Activity, currentMoveTV: TextView) {
             checkForPromotion(cell)
         }
         cell.piece!!.setIsMoved()
-        if (currentTeam == "WHITE") {
+        if (currentTeam == WHITE) {
             Collections.replaceAll(whiteCells, selectedCell, cell)
         } else {
             Collections.replaceAll(blackCells, selectedCell, cell)
@@ -176,18 +175,18 @@ class Board (activity: Activity, currentMoveTV: TextView) {
     }
 
     private fun checkForPromotion(cell: Cell) {
-        if (cell.piece!!.color == "WHITE" && cell.getX() == 7
-            || cell.piece!!.color == "BLACK" && cell.getX() == 0) {
+        if (cell.piece!!.color == WHITE && cell.getX() == 7
+            || cell.piece!!.color == BLACK && cell.getX() == 0) {
             cell.promotePawn()
             show()
         }
     }
 
     private fun switchCurrentTeam() {
-        currentTeam = if (currentTeam == "WHITE") {
-            "BLACK"
+        currentTeam = if (currentTeam == WHITE) {
+            BLACK
         } else {
-            "WHITE"
+            WHITE
         }
         activity.requireViewById<TextView>(R.id.current_move_tv).apply {
             text = currentTeam + "\n"
@@ -199,20 +198,12 @@ class Board (activity: Activity, currentMoveTV: TextView) {
     }
 
     private fun handleAllChecks() {
-        val currentTeamCells = if (currentTeam == "WHITE") whiteCells else blackCells
+        val currentTeamCells = if (currentTeam == WHITE) whiteCells else blackCells
         for (cell: Cell in currentTeamCells) {
             if (isCheck(cell.getPossibleMoves().toMutableList())) {
                 Log.d("Check", "from cell ${getChessCoords(cell.getX()!!, cell.getY()!!)}")
                 threatingCells.add(cell)
             }
-        }
-    }
-
-    fun onCheck(team: String) {
-        if (team == "WHITE") {
-            isWhiteCheck  = true
-        } else {
-            isBlackCheck = true
         }
     }
 
@@ -227,5 +218,10 @@ class Board (activity: Activity, currentMoveTV: TextView) {
 
     fun resumeMoveTimer() {
         moveTimer.start()
+    }
+    
+    companion object {
+        const val WHITE = "WHITE"
+        const val BLACK = "BLACK"
     }
 }
