@@ -2,13 +2,12 @@ package com.nikitasutulov.chessforandroid
 
 import android.app.Activity
 import android.util.Log
-import android.widget.Button
-import android.widget.GridLayout
-import android.widget.ImageView
-import android.widget.ScrollView
+import android.widget.*
+import java.util.*
 
-class Board (activity: Activity) {
+class Board (activity: Activity, currentMoveTV: TextView) {
     private val activity = activity
+    private val moveTimer = MoveTimer(activity, currentMoveTV)
     private val cells: Array<Array<Cell?>> = arrayOf(
         arrayOfNulls(8),
         arrayOfNulls(8),
@@ -19,6 +18,9 @@ class Board (activity: Activity) {
         arrayOfNulls(8),
         arrayOfNulls(8)
     )
+    private lateinit var whiteCells: MutableList<Cell>
+    private lateinit var blackCells: MutableList<Cell>
+    private var threatingCells = mutableListOf<Cell>()
     private lateinit var gridLayout: GridLayout
     private lateinit var gameModel: Model
 
@@ -37,9 +39,8 @@ class Board (activity: Activity) {
     private var currentTeam = "WHITE"
     private var possibleMoves = mutableListOf<Pair<Int, Int>>()
     private var isMoveStarted = false
-
-    private var whiteDeadPieces: ScrollView = activity.requireViewById(R.id.white_dead_pieces_scrollview)
-    private var blackDeadPieces: ScrollView = activity.requireViewById(R.id.black_dead_pieces_scrollview)
+    private var isWhiteCheck = false
+    private var isBlackCheck = false
 
     fun init(gridLayout: GridLayout, model: Model) {
         this.gridLayout = gridLayout
@@ -56,7 +57,22 @@ class Board (activity: Activity) {
             }
             cells[i] = cellsMutableList[i].toTypedArray()
         }
+        whiteCells = setCellsList("WHITE")
+        blackCells = setCellsList("BLACK")
         setCellButtonsOnClickListeners()
+        moveTimer.start()
+    }
+
+    private fun setCellsList(color: String): MutableList<Cell> {
+        val whiteCells = mutableListOf<Cell>()
+        for (i in 0..7) {
+            for (j in 0..7) {
+                if (cells[i][j]!!.piece?.color == color) {
+                    whiteCells.add(cells[i][j]!!)
+                }
+            }
+        }
+        return whiteCells
     }
 
     private fun setCellButtonsOnClickListeners() {
@@ -77,7 +93,7 @@ class Board (activity: Activity) {
         }
     }
 
-    fun toggleButtons(isGamePaused: Boolean) {
+    fun switchButtons(isGamePaused: Boolean) {
         for (i in 0..7) {
             for (j in 0..7) {
                 cells[i][j]!!.button!!.isClickable = !isGamePaused
@@ -110,17 +126,26 @@ class Board (activity: Activity) {
 
     fun getCells() = cells
 
-    fun doMove(cell: Cell) {
+    private fun doMove(cell: Cell) {
         if (!isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
             selectedCell = cell
             possibleMoves = selectedCell!!.getPossibleMoves().toMutableList()
             isMoveStarted = true
+            moveTimer.start()
+        } else if (isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
+            selectedCell = cell
+            possibleMoves = selectedCell!!.getPossibleMoves().toMutableList()
         } else if (isMoveStarted && cell.piece?.color != currentTeam) {
-            if (possibleMoves.filter { pair -> pair.first == cell.getX() && pair.second == cell.getY()}.isNotEmpty()) {
+            if (possibleMoves.any { pair -> pair.first == cell.getX() && pair.second == cell.getY() }) {
+                activity.requireViewById<TextView>(R.id.last_move_tv).apply {
+                    text = "${getChessCoords(selectedCell!!.getX()!!, selectedCell!!.getY()!!)} ${getChessCoords(cell.getX()!!, cell.getY()!!)}"
+                }
                 movePiece(selectedCell!!, cell)
                 selectedCell = null
                 isMoveStarted = false
                 switchCurrentTeam()
+                resetMoveTimer()
+                moveTimer.start()
             }
         }
     }
@@ -130,21 +155,31 @@ class Board (activity: Activity) {
             cell.piece = selectedCell.piece
             selectedCell.piece = null
         } else {
-            if (currentTeam == "WHITE") {
-//                blackDeadPieces.addView(ImageView(activity).apply {
-//                    scaleType = ImageView.ScaleType.FIT_XY
-//                    adjustViewBounds = true
-//                    setImageResource(cell.piece!!.getDrawableID())
-//                })
-            } else {
-//                whiteDeadPieces.addView(ImageView(activity).apply {
-//                    scaleType = ImageView.ScaleType.FIT_XY
-//                    adjustViewBounds = true
-//                    setImageResource(cell.piece!!.getDrawableID())
-//                })
-            }
             cell.piece = selectedCell.piece
             selectedCell.piece = null
+            if (currentTeam == "WHITE") {
+                blackCells.remove(cell)
+            } else {
+                whiteCells.remove(cell)
+            }
+        }
+        if (cell.piece!!::class.java.simpleName == "Pawn") {
+            checkForPromotion(cell)
+        }
+        cell.piece!!.setIsMoved()
+        if (currentTeam == "WHITE") {
+            Collections.replaceAll(whiteCells, selectedCell, cell)
+        } else {
+            Collections.replaceAll(blackCells, selectedCell, cell)
+        }
+        handleAllChecks()
+    }
+
+    private fun checkForPromotion(cell: Cell) {
+        if (cell.piece!!.color == "WHITE" && cell.getX() == 7
+            || cell.piece!!.color == "BLACK" && cell.getX() == 0) {
+            cell.promotePawn()
+            show()
         }
     }
 
@@ -154,5 +189,43 @@ class Board (activity: Activity) {
         } else {
             "WHITE"
         }
+        activity.requireViewById<TextView>(R.id.current_move_tv).apply {
+            text = currentTeam + "\n"
+        }
+    }
+
+    private fun isCheck(moves: MutableList<Pair<Int, Int>>): Boolean {
+        return (moves.any { move -> cells[move.first][move.second]!!.piece != null && cells[move.first][move.second]!!.piece!!::class.java.simpleName == "King" })
+    }
+
+    private fun handleAllChecks() {
+        val currentTeamCells = if (currentTeam == "WHITE") whiteCells else blackCells
+        for (cell: Cell in currentTeamCells) {
+            if (isCheck(cell.getPossibleMoves().toMutableList())) {
+                Log.d("Check", "from cell ${getChessCoords(cell.getX()!!, cell.getY()!!)}")
+                threatingCells.add(cell)
+            }
+        }
+    }
+
+    fun onCheck(team: String) {
+        if (team == "WHITE") {
+            isWhiteCheck  = true
+        } else {
+            isBlackCheck = true
+        }
+    }
+
+    fun resetMoveTimer() {
+        moveTimer.stop()
+        moveTimer.reset()
+    }
+
+    fun pauseMoveTimer() {
+        moveTimer.stop()
+    }
+
+    fun resumeMoveTimer() {
+        moveTimer.start()
     }
 }

@@ -33,29 +33,45 @@ class Cell(button: Button, piece: Piece?, board: Board) {
             "Pawn" -> {
                 if (piece!!.color == "WHITE") {
                     if (x!! != 7) {
-                        possibleMoves.add(Pair(x!! + 1, y!!))
+                        if (checkCellForFreeSpace(cells[x!! + 1][y!!]!!) && checkPawnStraightMove(cells[x!! + 1][y!!]!!)) {
+                            possibleMoves.add(Pair(x!! + 1, y!!))
+                        }
                     }
-                    if (x!! != 7 && y!! != 7) {
-                        possibleMoves.add(Pair(x!! + 1, y!! + 1))
+                    if (x!! != 7 && y!! != 7 && cells[x!! + 1][y!! + 1]!!.piece != null && cells[x!! + 1][y!! + 1]!!.piece?.color == "BLACK") {
+                        if (checkCellForFreeSpace(cells[x!! + 1][y!! + 1]!!)) {
+                            possibleMoves.add(Pair(x!! + 1, y!! + 1))
+                        }
                     }
-                    if (x!! != 7 && y!! != 0) {
-                        possibleMoves.add(Pair(x!! + 1, y!! - 1))
+                    if (x!! != 7 && y!! != 0 && cells[x!! + 1][y!! - 1]!!.piece != null && cells[x!! + 1][y!! - 1]!!.piece?.color == "BLACK") {
+                        if (checkCellForFreeSpace(cells[x!! + 1][y!! - 1]!!)) {
+                            possibleMoves.add(Pair(x!! + 1, y!! - 1))
+                        }
                     }
-                    if (!piece!!.isMoved && x!! != 6) {
-                        possibleMoves.add(Pair(x!! + 2, y!!))
+                    if (!piece!!.getIsMoved() && x!! < 6) {
+                        if (checkCellForFreeSpace(cells[x!! + 2][y!!]!!)) {
+                            possibleMoves.add(Pair(x!! + 2, y!!))
+                        }
                     }
                 } else if (piece!!.color == "BLACK") {
                     if (x!! != 0) {
-                        possibleMoves.add(Pair(x!! - 1, y!!))
+                        if (checkCellForFreeSpace(cells[x!! - 1][y!!]!!) && checkPawnStraightMove(cells[x!! - 1][y!!]!!)) {
+                            possibleMoves.add(Pair(x!! - 1, y!!))
+                        }
                     }
-                    if (x!! != 0 && y!! != 0) {
-                        possibleMoves.add(Pair(x!! - 1, y!! - 1))
+                    if (x!! != 0 && y!! != 0 && cells[x!! - 1][y!! - 1]!!.piece != null && cells[x!! - 1][y!! - 1]!!.piece?.color == "WHITE") {
+                        if (checkCellForFreeSpace(cells[x!! - 1][y!! - 1]!!)) {
+                            possibleMoves.add(Pair(x!! - 1, y!! - 1))
+                        }
                     }
-                    if (x!! != 0 && y!! != 7) {
-                        possibleMoves.add(Pair(x!! - 1, y!! + 1))
+                    if (x!! != 0 && y!! != 7 && cells[x!! - 1][y!! + 1]!!.piece != null && cells[x!! - 1][y!! + 1]!!.piece?.color == "WHITE") {
+                        if (checkCellForFreeSpace(cells[x!! - 1][y!! + 1]!!)) {
+                            possibleMoves.add(Pair(x!! - 1, y!! + 1))
+                        }
                     }
-                    if (!piece!!.isMoved && x!! > 1) {
-                        possibleMoves.add(Pair(x!! - 2, y!!))
+                    if (!piece!!.getIsMoved() && x!! > 1) {
+                        if (checkCellForFreeSpace(cells[x!! - 2][y!!]!!)) {
+                            possibleMoves.add(Pair(x!! - 2, y!!))
+                        }
                     }
                 }
             }
@@ -155,7 +171,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
             }
         }
         return possibleMoves.toTypedArray()
-            .also { it.map { pair -> Log.d("Possible moves", board.getChessCoords(pair.first, pair.second)) } }
+//            .also { it.map { pair -> Log.d("Possible moves", board.getChessCoords(pair.first, pair.second)) } }
     }
 
     private fun verticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
@@ -255,20 +271,31 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
     }
 
-    fun coordsInRange(x: Int, y: Int): Boolean {
+    private fun coordsInRange(x: Int, y: Int): Boolean {
         return (x in 0..7 && y in 0..7)
     }
 
-    fun checkCellForFreeSpace(cell: Cell): Boolean {
+    private fun checkCellForFreeSpace(cell: Cell): Boolean {
         if (cell.piece == null) {
             cell.isHiglighted = true
             return true
         }
-        if ((cell.piece!!.color == "WHITE" && piece!!.color == "BLACK")
-            || (cell.piece!!.color == "BLACK" && piece!!.color == "WHITE")) {
+        if (cell.piece!!.color == "WHITE" && piece!!.color == "BLACK"
+            || cell.piece!!.color == "BLACK" && piece!!.color == "WHITE") {
             cell.isHiglighted = true
             return true
         }
         return false
+    }
+
+    private fun checkPawnStraightMove(cell: Cell): Boolean {
+        if (cell.piece != null) {
+            return false
+        }
+        return true
+    }
+
+    fun promotePawn() {
+        piece = Queen(piece!!.color)
     }
 }

@@ -4,7 +4,7 @@ import android.app.Activity
 import android.graphics.drawable.Drawable
 
 abstract class Piece (color: String) {
-    val isMoved = false
+    private var isMoved = false
     val color = color
     lateinit var icon: Drawable
 
@@ -15,4 +15,10 @@ abstract class Piece (color: String) {
     open fun getHighlightedDrawableID(): Int {
         return 0
     }
+
+    fun setIsMoved() {
+        isMoved = true
+    }
+
+    fun getIsMoved(): Boolean = isMoved
 }

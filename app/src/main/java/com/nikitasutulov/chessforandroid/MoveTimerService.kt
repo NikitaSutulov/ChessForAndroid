@@ -5,8 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import java.util.*
 
-open class TimerService : Service()
-{
+class MoveTimerService: Service() {
     override fun onBind(p0: Intent?): IBinder? = null
 
     private val timer = Timer()
@@ -37,8 +36,7 @@ open class TimerService : Service()
 
     companion object
     {
-        const val TIMER_UPDATED = "timerUpdated"
-        const val TIME_EXTRA = "timeExtra"
+        const val TIMER_UPDATED = "moveTimerUpdated"
+        const val TIME_EXTRA = "moveTimeExtra"
     }
-
 }
