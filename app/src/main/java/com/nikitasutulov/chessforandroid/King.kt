@@ -7,5 +7,4 @@ class King(color: String) : Piece(color) {
             else -> R.drawable.b_king
         }
     }
-
 }

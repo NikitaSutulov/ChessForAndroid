@@ -7,5 +7,4 @@ class Knight(color: String) : Piece(color) {
             else -> R.drawable.b_knight
         }
     }
-
 }

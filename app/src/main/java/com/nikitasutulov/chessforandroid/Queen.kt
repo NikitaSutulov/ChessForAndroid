@@ -7,5 +7,4 @@ class Queen(color: String) : Piece(color) {
             else -> R.drawable.b_queen
         }
     }
-
 }

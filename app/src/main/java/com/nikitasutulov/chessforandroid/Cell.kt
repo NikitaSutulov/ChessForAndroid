@@ -6,6 +6,7 @@ import android.widget.Button
 class Cell(button: Button, piece: Piece?, board: Board) {
     val button = button
     var piece = piece
+    val board = board
     private val cells = board.getCells()
     private var x: Int? = null
     private var y: Int? = null
@@ -171,7 +172,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         return possibleMoves
     }
 
-    private fun castVerticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
+    fun castVerticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>) {
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, y!!)) {
                 if (!checkCellForFreeSpace(cells[i][y!!]!!)) {
@@ -206,7 +207,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
     }
 
-    private fun castDiagonal(possibleMoves: MutableList<Pair<Int, Int>>) {
+    fun castDiagonal(possibleMoves: MutableList<Pair<Int, Int>>) {
         var j = y!! + 1
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, j)) {
@@ -293,5 +294,19 @@ class Cell(button: Button, piece: Piece?, board: Board) {
 
     fun promotePawn() {
         piece = Queen(piece!!.color)
+    }
+
+    fun getSurroundingCells(surroundingCells: MutableList<Cell>) {
+        for (i in (getX()!! - 1)..(getX()!! + 1)) {
+            for (j in (getY()!! - 1)..(getY()!! + 1)) {
+                if (i != j && coordsInRange(i, j) && checkCellForFreeSpace(cells[i][j]!!)) {
+                    surroundingCells.add(cells[i][j]!!)
+                }
+            }
+        }
+    }
+
+    fun isUnderAttack(enemyCells: MutableList<Cell>): Boolean {
+        return enemyCells.any { cell -> cell.getPossibleMoves().any { move -> move.first == getX()!! && move.second == getY()!! } }
     }
 }
