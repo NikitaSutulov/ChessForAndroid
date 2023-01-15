@@ -165,7 +165,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
             teamCells = blackCells
             enemyCells = whiteCells
         }
-        val rooks = teamCells.filter { cell -> cell.piece is Rook && !cell.piece!!.getIsMoved()}
+        val rooks = teamCells.filter { cell -> cell.piece is Rook && !cell.piece!!.getIsMoved() }
         if (rooks.isEmpty()) {
             return
         }
@@ -213,8 +213,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     private fun movePiece(selectedCell: Cell, cell: Cell) {
         if (selectedCell.piece is King && abs(cell.getY()!! - selectedCell.getY()!!) == 2) {
             doCastling(selectedCell, cell)
-        }
-        else if (cell.piece == null) {
+        } else if (cell.piece == null) {
             cell.piece = selectedCell.piece
             selectedCell.piece = null
         } else {

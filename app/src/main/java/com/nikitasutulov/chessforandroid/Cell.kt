@@ -172,7 +172,10 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         return possibleMoves
     }
 
-    fun castVerticalHorizontal(possibleMoves: MutableList<Pair<Int, Int>>, isCheckingForMate: Boolean = false) {
+    fun castVerticalHorizontal(
+        possibleMoves: MutableList<Pair<Int, Int>>,
+        isCheckingForMate: Boolean = false
+    ) {
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, y!!)) {
                 if (!checkCellForFreeSpace(cells[i][y!!]!!, possibleMoves)) {
@@ -273,7 +276,11 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         return (x in 0..7 && y in 0..7)
     }
 
-    private fun checkCellForFreeSpace(cell: Cell, possibleMoves: MutableList<Pair<Int, Int>>, isCheckingForMate: Boolean = false): Boolean {
+    private fun checkCellForFreeSpace(
+        cell: Cell,
+        possibleMoves: MutableList<Pair<Int, Int>>,
+        isCheckingForMate: Boolean = false
+    ): Boolean {
         if (cell.piece == null) {
             return true
         }
