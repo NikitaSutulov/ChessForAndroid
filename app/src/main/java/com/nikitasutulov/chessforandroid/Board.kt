@@ -342,7 +342,6 @@ class Board(activity: Activity, currentMoveTV: TextView) {
             return true
         }
         if (threatingCells[0].isUnderAttack(teamCells, true)) {
-            Log.d("Checking for mate", "problem is here")
             return false
         }
         if (threatingCells[0].piece is Knight) {
