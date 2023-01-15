@@ -4,6 +4,7 @@ import android.app.Activity
 import android.util.Log
 import android.widget.*
 import java.util.*
+import kotlin.math.abs
 
 class Board(activity: Activity, currentMoveTV: TextView) {
     private val activity = activity
@@ -98,7 +99,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     fun switchButtons(isGamePaused: Boolean) {
         for (i in 0..7) {
             for (j in 0..7) {
-                cells[i][j]!!.button!!.isClickable = !isGamePaused
+                cells[i][j]!!.button.isClickable = !isGamePaused
             }
         }
     }
@@ -122,21 +123,21 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     fun getCells() = cells
 
     private fun doMove(cell: Cell) {
-//        isMate = checkForMate(currentTeam)
-//        if (!isMate) {
-//            cancelCheck()
-//        } else {
-//            onGameOver()
-//            return
-//        }
         if (!isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
             selectedCell = cell
             possibleMoves = selectedCell!!.getPossibleMoves()
+            if (selectedCell!!.piece is King && !selectedCell!!.piece!!.getIsMoved()) {
+                checkForCastling(selectedCell!!, possibleMoves)
+                Log.d("Castling", "checking")
+            }
             isMoveStarted = true
             moveTimer.start()
         } else if (isMoveStarted && cell.piece != null && cell.piece?.color == currentTeam) {
             selectedCell = cell
             possibleMoves = selectedCell!!.getPossibleMoves()
+            if (selectedCell!!.piece is King && !selectedCell!!.piece!!.getIsMoved()) {
+                checkForCastling(selectedCell!!, possibleMoves)
+            }
         } else if (isMoveStarted && cell.piece?.color != currentTeam) {
             if (possibleMoves.any { pair -> pair.first == cell.getX() && pair.second == cell.getY() }) {
                 activity.requireViewById<TextView>(R.id.last_move_tv).apply {
@@ -152,12 +153,61 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         }
     }
 
+    private fun checkForCastling(king: Cell, possibleMoves: MutableList<Pair<Int, Int>>) {
+        var teamCells: MutableList<Cell>
+        var enemyCells: MutableList<Cell>
+        if (currentTeam == WHITE) {
+            teamCells = whiteCells
+            enemyCells = blackCells
+        } else {
+            teamCells = blackCells
+            enemyCells = whiteCells
+        }
+        val rooks = teamCells.filter { cell -> cell.piece is Rook && !cell.piece!!.getIsMoved()}
+        if (rooks.isEmpty()) {
+            return
+        }
+        var startY: Int
+        var endY: Int
+        var yToMoveKingTo: Int
+        val kingX = king.getX()!!
+        for (rook: Cell in rooks) {
+            var isRookAbleForCastling = true
+            if (rook.getY()!! < king.getY()!!) {
+                startY = rook.getY()!!
+                endY = king.getY()!!
+                yToMoveKingTo = king.getY()!! - 2
+            } else {
+                startY = king.getY()!!
+                endY = rook.getY()!!
+                yToMoveKingTo = king.getY()!! + 2
+            }
+            for (y in startY..endY) {
+                if (y != rook.getY()!! && (
+                    cells[kingX][y]!!.piece == null && cells[kingX][y]!!.isUnderAttack(enemyCells) ||
+                    cells[kingX][y]!!.piece != null && cells[kingX][y]!!.isUnderAttack(enemyCells))
+                ) {
+                    isRookAbleForCastling = false
+                    break
+                }
+            }
+            if (!isRookAbleForCastling) {
+                break
+            }
+            Log.d("Castling", "adding a move")
+            possibleMoves.add(Pair(kingX, yToMoveKingTo))
+        }
+    }
+
     private fun onGameOver() {
-        Toast.makeText(activity, "Mate! Game over!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "$currentTeam: Mate! Game over!", Toast.LENGTH_SHORT).show()
     }
 
     private fun movePiece(selectedCell: Cell, cell: Cell) {
-        if (cell.piece == null) {
+        if (selectedCell.piece is King && abs(cell.getY()!! - selectedCell.getY()!!) == 2) {
+            doCastling(selectedCell, cell)
+        }
+        else if (cell.piece == null) {
             cell.piece = selectedCell.piece
             selectedCell.piece = null
         } else {
@@ -183,8 +233,31 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         } else {
             WHITE
         }
+        show()
         listenMate(currentTeam)
         listenMate(enemyTeam)
+    }
+
+    private fun doCastling(king: Cell, cell: Cell) {
+        var rookY = if (cell.getY()!! < king.getY()!!) {
+            0
+        } else {
+            7
+        }
+        if (rookY == 0) {
+            swapPieces(cells[king.getX()!!][rookY]!!, cells[king.getX()!!][king.getY()!! - 1]!!)
+            swapPieces(king, cell)
+        } else {
+            swapPieces(cells[king.getX()!!][rookY]!!, cells[king.getX()!!][king.getY()!! + 1]!!)
+            swapPieces(king, cell)
+        }
+    }
+
+    private fun swapPieces(cell1: Cell, cell2: Cell) {
+        Log.d("Castling", "swapping cells ${getChessCoords(cell1.getX()!!, cell1.getY()!!)} and ${getChessCoords(cell2.getX()!!, cell2.getY()!!)}")
+        val tmp = cell1.piece
+        cell1.piece = cell2.piece
+        cell2.piece = tmp
     }
 
     private fun checkForPromotion(cell: Cell) {
