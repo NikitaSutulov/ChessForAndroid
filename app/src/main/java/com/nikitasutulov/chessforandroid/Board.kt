@@ -261,7 +261,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         if (threatingCells.size > 1) {
             return true
         }
-        if (threatingCells[0].isUnderAttack(teamCells)) {
+        if (threatingCells[0].isUnderAttack(teamCells, true)) {
             Log.d("Checking for mate", "problem is here")
             return false
         }
