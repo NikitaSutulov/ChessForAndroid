@@ -178,7 +178,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
     ) {
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, y!!)) {
-                if (!checkCellForFreeSpace(cells[i][y!!]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[i][y!!]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(i, y!!))
@@ -186,7 +186,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
         for (i in (x!! - 1) downTo 0) {
             if (coordsInRange(i, y!!)) {
-                if (!checkCellForFreeSpace(cells[i][y!!]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[i][y!!]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(i, y!!))
@@ -194,7 +194,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         }
         for (j in (y!! + 1)..7) {
             if (coordsInRange(x!!, j)) {
-                if (!checkCellForFreeSpace(cells[x!!][j]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[x!!][j]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(x!!, j))
@@ -214,7 +214,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         var j = y!! + 1
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -229,7 +229,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         j = y!! - 1
         for (i in (x!! + 1)..7) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -244,7 +244,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         j = y!! + 1
         for (i in (x!! - 1) downTo 0) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
@@ -259,7 +259,7 @@ class Cell(button: Button, piece: Piece?, board: Board) {
         j = y!! - 1
         for (i in (x!! - 1) downTo 0) {
             if (coordsInRange(i, j)) {
-                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves)) {
+                if (!checkCellForFreeSpace(cells[i][j]!!, possibleMoves, isCheckingForMate)) {
                     break
                 }
                 possibleMoves.add(Pair(i, j))
