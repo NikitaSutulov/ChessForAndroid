@@ -153,6 +153,8 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         }
     }
 
+    fun getIsMate(): Boolean = isMate
+
     private fun checkForCastling(king: Cell, possibleMoves: MutableList<Pair<Int, Int>>) {
         var teamCells: MutableList<Cell>
         var enemyCells: MutableList<Cell>
@@ -204,7 +206,8 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     }
 
     private fun onGameOver() {
-        Toast.makeText(activity, "$currentTeam: Mate! Game over!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "$currentTeam has made a mate! Game over!", Toast.LENGTH_SHORT).show()
+        switchButtons(true)
     }
 
     private fun movePiece(selectedCell: Cell, cell: Cell) {
@@ -238,8 +241,8 @@ class Board(activity: Activity, currentMoveTV: TextView) {
             WHITE
         }
         show()
-        listenMate(currentTeam)
-        listenMate(enemyTeam)
+        catchMate(currentTeam)
+        catchMate(enemyTeam)
     }
 
     private fun doCastling(king: Cell, cell: Cell) {
@@ -358,7 +361,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         return true
     }
 
-    private fun listenMate(team: String) {
+    private fun catchMate(team: String) {
         isMate = checkForMate(team)
         Log.d("Checking for mate", "$team : $isMate")
         if (!isMate) {

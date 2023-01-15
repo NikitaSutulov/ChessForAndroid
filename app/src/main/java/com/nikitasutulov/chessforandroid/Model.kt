@@ -106,6 +106,9 @@ class Model() {
     }
 
     fun pauseOrResumeGame() {
+        if (board.getIsMate()) {
+            return
+        }
         if (isGamePaused) {
             resumeGame()
         } else {
