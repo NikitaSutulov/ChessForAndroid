@@ -183,16 +183,20 @@ class Board(activity: Activity, currentMoveTV: TextView) {
                 yToMoveKingTo = king.getY()!! + 2
             }
             for (y in startY..endY) {
-                if (y != rook.getY()!! && (
+                if (y == rook.getY()!! || y == king.getY()!!) {
+                    continue
+                }
+                Log.d("Castling", "checking cell ${getChessCoords(kingX, y)}")
+                if (
                     cells[kingX][y]!!.piece == null && cells[kingX][y]!!.isUnderAttack(enemyCells) ||
-                    cells[kingX][y]!!.piece != null && cells[kingX][y]!!.isUnderAttack(enemyCells))
+                    cells[kingX][y]!!.piece != null
                 ) {
                     isRookAbleForCastling = false
                     break
                 }
             }
             if (!isRookAbleForCastling) {
-                break
+                continue
             }
             Log.d("Castling", "adding a move")
             possibleMoves.add(Pair(kingX, yToMoveKingTo))
@@ -244,6 +248,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         } else {
             7
         }
+        cells[king.getX()!!][rookY]!!.piece!!.setIsMoved()
         if (rookY == 0) {
             swapPieces(cells[king.getX()!!][rookY]!!, cells[king.getX()!!][king.getY()!! - 1]!!)
             swapPieces(king, cell)
