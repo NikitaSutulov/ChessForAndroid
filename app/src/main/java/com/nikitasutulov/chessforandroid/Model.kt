@@ -114,7 +114,7 @@ class Model() {
         } else {
             pauseGame()
         }
-        board.switchButtons(isGamePaused)
+        board.switchButtonsBlocking(isGamePaused)
     }
 
     private fun pauseGame() {

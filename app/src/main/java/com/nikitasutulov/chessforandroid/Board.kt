@@ -21,7 +21,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
     )
     private lateinit var whiteCells: MutableList<Cell>
     private lateinit var blackCells: MutableList<Cell>
-    private var threatingCells = mutableListOf<Cell>()
+    private var threateningCells = mutableListOf<Cell>()
     private lateinit var gridLayout: GridLayout
     private lateinit var gameModel: Model
 
@@ -96,7 +96,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         }
     }
 
-    fun switchButtons(isGamePaused: Boolean) {
+    fun switchButtonsBlocking(isGamePaused: Boolean) {
         for (i in 0..7) {
             for (j in 0..7) {
                 cells[i][j]!!.button.isClickable = !isGamePaused
@@ -207,7 +207,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
 
     private fun onGameOver() {
         Toast.makeText(activity, "$currentTeam has made a mate! Game over!", Toast.LENGTH_SHORT).show()
-        switchButtons(true)
+        switchButtonsBlocking(true)
     }
 
     private fun movePiece(selectedCell: Cell, cell: Cell) {
@@ -272,7 +272,6 @@ class Board(activity: Activity, currentMoveTV: TextView) {
             cell.piece!!.color == BLACK && cell.getX() == 0
         ) {
             cell.promotePawn()
-            show()
         }
     }
 
@@ -301,8 +300,8 @@ class Board(activity: Activity, currentMoveTV: TextView) {
                 isCheck = true
                 Log.d("Check", "from cell ${getChessCoords(cell.getX()!!, cell.getY()!!)}")
                 Toast.makeText(activity, "Check", Toast.LENGTH_SHORT).show()
-                if (threatingCells.find { cellToFind -> cellToFind === cell } == null)
-                    threatingCells.add(cell)
+                if (threateningCells.find { cellToFind -> cellToFind === cell } == null)
+                    threateningCells.add(cell)
             }
         }
         if (!isAnyCheck) {
@@ -312,7 +311,7 @@ class Board(activity: Activity, currentMoveTV: TextView) {
 
     private fun cancelCheck() {
         isCheck = false
-        threatingCells = mutableListOf()
+        threateningCells = mutableListOf()
     }
 
     private fun checkForMate(team: String): Boolean {
@@ -338,16 +337,16 @@ class Board(activity: Activity, currentMoveTV: TextView) {
         if (surroundingCells.all { cell -> cell.isUnderAttack(enemyCells) }) {
             return true
         }
-        if (threatingCells.size > 1) {
+        if (threateningCells.size > 1) {
             return true
         }
-        if (threatingCells[0].isUnderAttack(teamCells, true)) {
+        if (threateningCells[0].isUnderAttack(teamCells, true)) {
             return false
         }
-        if (threatingCells[0].piece is Knight) {
+        if (threateningCells[0].piece is Knight) {
             return true
         }
-        if (surroundingCells.any { cell -> cell === threatingCells[0] }) {
+        if (surroundingCells.any { cell -> cell === threateningCells[0] }) {
             return true
         }
         val kingThreatWays = mutableListOf<Pair<Int, Int>>()
