@@ -25,3 +25,9 @@ While playing, you can see timers showing the general game time and the current 
 ## How it looks:
 
 ![Game example](app/src/main/res/drawable/example1.png)
+![Game example](app/src/main/res/drawable/example2.png)
+![Game example](app/src/main/res/drawable/example3.png)
+![Game example](app/src/main/res/drawable/example4.png)
+![Game example](app/src/main/res/drawable/example5.png)
+![Game example](app/src/main/res/drawable/example6.png)
+![Game example](app/src/main/res/drawable/example7.png)
